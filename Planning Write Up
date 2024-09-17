@@ -1,5 +1,14 @@
 Division of Labor:
 
+Mina-
+Player and Hand Implementation: Responsible for hand management, sorting cards, and UI display.
+
+Makoto-
+Deck and Game Logic: Handles the deck, shuffling, dealing, and the flow of the game.
+
+Elizabeth-
+Opponent Simulation: Focus on creating the logic for the computer opponents.
+Testing and Edge Cases: Identify and handle scenarios like invalid input, running out of cards, etc.
 
 UML Diagram:
 
