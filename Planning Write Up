@@ -10,7 +10,7 @@ Elizabeth-
 Opponent Simulation: Focus on creating the logic for the computer opponents.
 Testing and Edge Cases: Identify and handle scenarios like invalid input, running out of cards, etc.
 
-UML Diagram:
+UML Class Diagram:
 
 +---------------------+
 |        Card         |
