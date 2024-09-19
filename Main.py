@@ -1,145 +1,136 @@
+def merge_sort(cards):
+    if len(cards) > 1:
+        mid = len(cards) // 2
+        left_half = cards[:mid]
+        right_half = cards[mid:]
+
+        merge_sort(left_half)
+        merge_sort(right_half)
+
+        i = j = k = 0
+
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i].compare(right_half[j]) <= 0:
+                cards[k] = left_half[i]
+                i += 1
+            else:
+                cards[k] = right_half[j]
+                j += 1
+            k += 1
+
+        while i < len(left_half):
+            cards[k] = left_half[i]
+            i += 1
+            k += 1
+
+        while j < len(right_half):
+            cards[k] = right_half[j]
+            j += 1
+            k += 1
+
 import random
 
-### 1. Card Class ###
 class Card:
-    def __init__(self, rank, suit):
+    def __init__(self, rank: str, suit: str):
         self.rank = rank
         self.suit = suit
-    
+
+    def compare(self, card):
+        return (self.rank, self.suit) < (card.rank, card.suit)
+
     def __str__(self):
         return f"{self.rank} of {self.suit}"
-    
-    # For sorting purposes: comparison by rank, then by suit
-    def __lt__(self, other):
-        rank_order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-        suit_order = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
-        if self.rank == other.rank:
-            return suit_order.index(self.suit) < suit_order.index(other.suit)
-        return rank_order.index(self.rank) < rank_order.index(other.rank)
 
-### 2. Deck Class ###
 class Deck:
+    suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+
     def __init__(self):
-        suits = ['Clubs', 'Diamonds', 'Hearts', 'Spades']
-        ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-        self.cards = [Card(rank, suit) for suit in suits for rank in ranks]
-    
+        self.cards = [Card(rank, suit) for suit in self.suits for rank in self.ranks]
+        self.shuffle()
+
     def shuffle(self):
         random.shuffle(self.cards)
-    
-    def deal(self, num_cards):
-        hand = self.cards[:num_cards]
-        self.cards = self.cards[num_cards:]
-        return hand
 
-### 3. Player Class ###
+    def deal(self, num):
+        return [self.cards.pop() for _ in range(num)]
+
+    def __str__(self):
+        return ', '.join(str(card) for card in self.cards)
+
 class Player:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
         self.hand = []
-    
-    def receive_cards(self, cards):
-        self.hand.extend(cards)
-    
-    # Use an efficient sorting algorithm (Merge Sort)
+        self.rounds_won = 0
+
     def sort_hand(self):
-        self.hand = merge_sort(self.hand)
-    
-    def play_card(self):
-        if self.hand:
-            return self.hand.pop(0)  # Plays the first (smallest) card in the hand
-        else:
-            return None
-    
-    def show_hand(self):
-        return ', '.join([str(card) for card in self.hand])
+        merge_sort(self.hand)
 
-### 4. Opponent Class (AI) ###
+    def play_card(self, index):
+        if 0 <= index < len(self.hand):
+            return self.hand.pop(index)
+        raise IndexError("Invalid card index")
+
+    def __str__(self):
+        return f"Player's hand: {', '.join(str(card) for card in self.hand)}"
+
 class Opponent(Player):
-    def simulate_turn(self):
+    def play_card_auto(self):
         if self.hand:
-            print(f"{self.name} played: {self.play_card()}")
-        else:
-            print(f"{self.name} has no more cards to play!")
+            return self.hand.pop(0)  # Play the first card automatically
+        raise IndexError("No cards to play")
 
-### 5. Merge Sort (for sorting the hand) ###
-def merge_sort(cards):
-    if len(cards) <= 1:
-        return cards
-    mid = len(cards) // 2
-    left = merge_sort(cards[:mid])
-    right = merge_sort(cards[mid:])
-    return merge(left, right)
-
-def merge(left, right):
-    result = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] < right[j]:
-            result.append(left[i])
-            i += 1
-        else:
-            result.append(right[j])
-            j += 1
-    result.extend(left[i:])
-    result.extend(right[j:])
-    return result
-
-### 6. Game Logic ###
 class CardGame:
-    def __init__(self, num_cards_per_hand):
+    def __init__(self):
         self.deck = Deck()
-        self.deck.shuffle()
-        self.num_cards_per_hand = num_cards_per_hand
-        self.player = Player("Player")
-        self.opponent = Opponent("Opponent")
-    
-    def deal_cards(self):
-        player_hand = self.deck.deal(self.num_cards_per_hand)
-        opponent_hand = self.deck.deal(self.num_cards_per_hand)
-        
-        self.player.receive_cards(player_hand)
-        self.opponent.receive_cards(opponent_hand)
-        
-        print("Cards dealt.")
-        print(f"Your hand: {self.player.show_hand()}")
-        print(f"{self.opponent.name}'s hand: [Hidden]")
-    
-    def sort_hands(self):
-        print("\nSorting hands...\n")
+        self.player = Player()
+        self.opponent = Opponent()
+        self.current_round = 0
+
+    def start_game(self):
+        self.player.hand = self.deck.deal(5)
+        self.opponent.hand = self.deck.deal(5)
         self.player.sort_hand()
         self.opponent.sort_hand()
-        
-        print(f"Your sorted hand: {self.player.show_hand()}")
-    
-    def play_game(self):
-        self.deal_cards()
-        self.sort_hands()
-        
-        round_number = 1
-        while self.player.hand or self.opponent.hand:
-            print(f"\n--- Round {round_number} ---")
-            player_card = self.player.play_card()
-            if player_card:
+        self.play_round()
+
+    def play_round(self):
+        self.current_round += 1
+        print(f"\nRound {self.current_round}")
+        print(self.player)
+        print(f"Opponent's hand: {len(self.opponent.hand)} cards")
+
+        while True:
+            try:
+                index = int(input("Choose a card index to play (0 to {}): ".format(len(self.player.hand) - 1)))
+                player_card = self.player.play_card(index)
                 print(f"You played: {player_card}")
-            else:
-                print("You have no more cards to play!")
-            
-            self.opponent.simulate_turn()
-            round_number += 1
+                break
+            except (ValueError, IndexError) as e:
+                print(f"Error: {str(e)}. Please enter a valid index.")
 
-        print("\nGame Over!")
-        if len(self.player.hand) > len(self.opponent.hand):
-            print("You win!")
-        elif len(self.opponent.hand) > len yours:
-            print("Opponent wins!")
+        opponent_card = self.opponent.play_card_auto()
+        print(f"Opponent played: {opponent_card}")
+
+        # Compare cards to determine the round winner
+        if player_card.compare(opponent_card):
+            self.player.rounds_won += 1
+            print("You win this round!")
         else:
-            print("It's a tie!")
-        
+            self.opponent.rounds_won += 1
+            print("Opponent wins this round!")
 
-### 7. Running the Game ###
+        self.player.sort_hand()
+        self.opponent.sort_hand()
+
+        # Ask if the game should continue
+        if len(self.player.hand) > 0 and len(self.opponent.hand) > 0:
+            self.play_round()
+        else:
+            print("Game over!")
+            print(f"You won {self.player.rounds_won} rounds.")
+            print(f"Opponent won {self.opponent.rounds_won} rounds.")
+
 if __name__ == "__main__":
-    # Start the game with 5 cards per hand
-    game = CardGame(num_cards_per_hand=5)
-    game.play_game()
-
+    game = CardGame()
+    game.start_game()
