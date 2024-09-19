@@ -13,57 +13,68 @@ Testing and Edge Cases: Identify and handle scenarios like invalid input, runnin
 UML Diagram:
 
 +---------------------+
-|       Card          |
+|        Card         |
 +---------------------+
-| - rank: String      |
-| - suit: String      |
+| - rank: str         |
+| - suit: str         |
 +---------------------+
-| + __lt__()          |
-| + get_rank_value()  |
+| + __init__(rank, suit)  |
+| + compare(card)     |
+| + __str__()         |
 +---------------------+
 
-         ^   
-         |  (uses composition)
-         |
+            <>
+            |  (composition)
+            |
 +---------------------+
-|       Deck          |
+|        Deck         |
 +---------------------+
-| - cards: List<Card> |
+| - cards: List[Card] |
 +---------------------+
+| + __init__()        |
 | + shuffle()         |
-| + deal(num: int)    |
+| + deal(num)         |
+| + __str__()         |
 +---------------------+
 
-         ^
-         | (has a)
-         |
-+---------------------+           +---------------------+
-|       Player        |<----------|     Opponent        |
-+---------------------+           +---------------------+
-| - name: String      |           | - simulate_turn()   |
-| - hand: List<Card>  |           +---------------------+
-| - wins: int         |
+            <>
+            | (composition)
+            |
 +---------------------+
-| + receive_cards()   |
+|       Player        |
++---------------------+
+| - hand: List[Card]  |
+| - rounds_won: int   |
++---------------------+
+| + __init__()        |
 | + sort_hand()       |
-| + play_card()       |
-| + show_hand()       |
-| + increment_wins()  |
+| + play_card(index)  |
+| + __str__()         |
 +---------------------+
 
-         ^
-         | (has a)
-         |
+            ^
+            | (inheritance)
+            |
 +---------------------+
-|     CardGame        |
+|      Opponent       |
++---------------------+
+|                     |
++---------------------+
+| + play_card_auto()  |
++---------------------+
+
+            <>
+            | (composition)
+            |
++---------------------+
+|      CardGame       |
 +---------------------+
 | - deck: Deck        |
 | - player: Player    |
 | - opponent: Opponent|
-| - num_cards: int    |
+| - current_round: int|
 +---------------------+
-| + deal_cards()      |
-| + sort_hands()      |
-| + compare_cards()   |
-| + play_game()       |
+| + __init__()        |
+| + start_game()      |
+| + play_round()      |
 +---------------------+
