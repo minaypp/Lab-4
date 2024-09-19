@@ -12,3 +12,58 @@ Testing and Edge Cases: Identify and handle scenarios like invalid input, runnin
 
 UML Diagram:
 
++---------------------+
+|       Card          |
++---------------------+
+| - rank: String      |
+| - suit: String      |
++---------------------+
+| + __lt__()          |
+| + get_rank_value()  |
++---------------------+
+
+         ^   
+         |  (uses composition)
+         |
++---------------------+
+|       Deck          |
++---------------------+
+| - cards: List<Card> |
++---------------------+
+| + shuffle()         |
+| + deal(num: int)    |
++---------------------+
+
+         ^
+         | (has a)
+         |
++---------------------+           +---------------------+
+|       Player        |<----------|     Opponent        |
++---------------------+           +---------------------+
+| - name: String      |           | - simulate_turn()   |
+| - hand: List<Card>  |           +---------------------+
+| - wins: int         |
++---------------------+
+| + receive_cards()   |
+| + sort_hand()       |
+| + play_card()       |
+| + show_hand()       |
+| + increment_wins()  |
++---------------------+
+
+         ^
+         | (has a)
+         |
++---------------------+
+|     CardGame        |
++---------------------+
+| - deck: Deck        |
+| - player: Player    |
+| - opponent: Opponent|
+| - num_cards: int    |
++---------------------+
+| + deal_cards()      |
+| + sort_hands()      |
+| + compare_cards()   |
+| + play_game()       |
++---------------------+
